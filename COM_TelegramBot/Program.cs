@@ -8,6 +8,7 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Office.Interop.Word;
+using Rectangle = System.Drawing.Rectangle;
 using Word = Microsoft.Office.Interop.Word;
 
 namespace COM_TelegramBot
@@ -28,13 +29,13 @@ namespace COM_TelegramBot
 
 
 
-                SearchInTextBox(strToSearhFor);
-                SearchInParagraphs(strToSearhFor);
-                ConvertDocToJpeg(pagesNumbersList.ToArray());
-             
+                //SearchInTextBox(strToSearhFor);
+                //SearchInParagraphs(strToSearhFor);
+                //ConvertDocToJpeg(pagesNumbersList.ToArray());
 
+                ConvertDocToJpeg(1);
 
-
+                Console.WriteLine("finished");
                 wordApp.Visible = false;
 
                 Console.ReadLine();
@@ -48,8 +49,6 @@ namespace COM_TelegramBot
 
         public static void ConvertDocToJpeg(params int[] pagesNumbersToBeConverted)
         {
-            //int[] orderedPages = (from number in pagesNumbersToBeConverted orderby number select number).ToArray();
-
             foreach (int pageNumber in pagesNumbersToBeConverted)
             {
                 wordApp.Selection.GoTo(WdGoToItem.wdGoToPage, WdGoToDirection.wdGoToAbsolute, pageNumber);
@@ -57,13 +56,48 @@ namespace COM_TelegramBot
                 var page = wordDoc.ActiveWindow.ActivePane.Pages[pageNumber];
                 var bits = page.EnhMetaFileBits;
                 var target = @"C:\Users\Mi\Desktop\a" + "_image" + pageNumber + ".doc";
+
                 using (var ms = new MemoryStream((byte[])(bits)))
                 {
-                    var image = System.Drawing.Image.FromStream(ms);
-                    var pngTarget = Path.ChangeExtension(target, "png");
-                    image.Save(pngTarget, ImageFormat.Png);
+                    using (Bitmap bitmap = new Bitmap(ms))
+                    {
+                        var pngTarget = Path.ChangeExtension(target, "jpeg");
+
+
+                        using (Bitmap targetBmp = bitmap.Clone(new Rectangle(0, 0, bitmap.Width, bitmap.Height), PixelFormat.Format32bppArgb))
+                        {
+                            targetBmp.Save(pngTarget, ImageFormat.Jpeg);
+                        }
+                    }
+
+                   
+                    
+
+
+
+
+
+
+
+                    //var image = System.Drawing.Image.FromStream(ms);
+                    //var pngTarget = Path.ChangeExtension(target, "png");
+                    //image.Save(pngTarget, ImageFormat.Png);
                 }
             }
+        }
+
+        public static Bitmap Transparent2Color(Bitmap bmp1, Color target)
+        {
+            Bitmap bmp2 = new Bitmap(bmp1.Width, bmp1.Height);
+            Rectangle rect = new Rectangle(System.Drawing.Point.Empty, bmp1.Size);
+            using (Graphics G = Graphics.FromImage(bmp2))
+            {
+                G.Clear(target);
+                G.DrawImageUnscaledAndClipped(bmp1, rect);
+            }
+            return bmp2;
+
+            //Transparent2Color(bitmap, Color.White).Save(pngTarget, ImageFormat.Jpeg);
         }
 
         public static void SearchInTextBox(string wordToSearchFor)
