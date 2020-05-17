@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
@@ -7,6 +8,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 using Microsoft.Office.Interop.Word;
 using Rectangle = System.Drawing.Rectangle;
 using Word = Microsoft.Office.Interop.Word;
@@ -17,71 +19,61 @@ namespace COM_TelegramBot
     {
         public static Word.Application wordApp;
         public static Document wordDoc;
+
         public static List<int> pagesNumbersList = new List<int>();
+
+        public static DirectoryInfo dir = new DirectoryInfo(@"C:\Users\Mi\Desktop\bot\data");
+        public  static List<FileInfo> FileNames = new List<FileInfo>();
+
+        public static string strToSearhFor = "reklamacj";
         public static void Main(string[] args)
-        {
-            try
+        { 
+            dir.GetFiles().Foreach(fileInfo => FileNames.Add(fileInfo));
+
+            foreach (FileInfo fileName in FileNames)
             {
-                wordApp = new Word.Application();
-                wordDoc = wordApp.Documents.OpenNoRepairDialog(FileName: @"C:\Users\Mi\Desktop\a.doc", ReadOnly: false);
+                try
+                {
+                    wordApp = new Word.Application();
+                    wordDoc = wordApp.Documents.OpenNoRepairDialog(FileName: fileName.FullName, ReadOnly: false);
 
-                string strToSearhFor = "protest";
+                    SearchInTextBox(strToSearhFor);
+                    SearchInParagraphs(strToSearhFor);
+                    ConvertDocToJpeg(strToSearhFor, fileName.Name, pagesNumbersList.ToArray());
 
-
-
-                //SearchInTextBox(strToSearhFor);
-                //SearchInParagraphs(strToSearhFor);
-                //ConvertDocToJpeg(pagesNumbersList.ToArray());
-
-                ConvertDocToJpeg(1);
-
-                Console.WriteLine("finished");
-                wordApp.Visible = false;
-
-                Console.ReadLine();
+                    wordApp.Visible = false;
+                }
+                finally
+                {
+                    wordDoc.Close(false);
+                    wordApp.Quit(false);
+                    pagesNumbersList.Clear();
+                }
             }
-            finally
-            {
-                wordDoc.Close(false);
-                wordApp.Quit(false);
-            }
+            Console.WriteLine("finished");
+            Console.ReadLine();
         }
 
-        public static void ConvertDocToJpeg(params int[] pagesNumbersToBeConverted)
+        public static void ConvertDocToJpeg(string searchWord, string fileName, params int[] pagesNumbersToBeConverted)
         {
+            DirectoryInfo wordDir = dir.Parent.CreateSubdirectory(searchWord); //tmp
+
             foreach (int pageNumber in pagesNumbersToBeConverted)
             {
                 wordApp.Selection.GoTo(WdGoToItem.wdGoToPage, WdGoToDirection.wdGoToAbsolute, pageNumber);
 
                 var page = wordDoc.ActiveWindow.ActivePane.Pages[pageNumber];
                 var bits = page.EnhMetaFileBits;
-                var target = @"C:\Users\Mi\Desktop\a" + "_image" + pageNumber + ".doc";
 
+                string target = wordDir.FullName + @"\" + searchWord + "_" + pageNumber +"_" + fileName;
+               
                 using (var ms = new MemoryStream((byte[])(bits)))
                 {
-                    using (Bitmap bitmap = new Bitmap(ms))
-                    {
-                        var pngTarget = Path.ChangeExtension(target, "jpeg");
-
-
-                        using (Bitmap targetBmp = bitmap.Clone(new Rectangle(0, 0, bitmap.Width, bitmap.Height), PixelFormat.Format32bppArgb))
-                        {
-                            targetBmp.Save(pngTarget, ImageFormat.Jpeg);
-                        }
-                    }
-
-                   
+                    Bitmap bitmap = new Bitmap(ms);
                     
+                    var pngTarget = Path.ChangeExtension(target, "jpeg");
 
-
-
-
-
-
-
-                    //var image = System.Drawing.Image.FromStream(ms);
-                    //var pngTarget = Path.ChangeExtension(target, "png");
-                    //image.Save(pngTarget, ImageFormat.Png);
+                    Transparent2Color(bitmap, Color.White).Save(pngTarget, ImageFormat.Jpeg);
                 }
             }
         }
@@ -96,8 +88,6 @@ namespace COM_TelegramBot
                 G.DrawImageUnscaledAndClipped(bmp1, rect);
             }
             return bmp2;
-
-            //Transparent2Color(bitmap, Color.White).Save(pngTarget, ImageFormat.Jpeg);
         }
 
         public static void SearchInTextBox(string wordToSearchFor)
@@ -158,4 +148,13 @@ namespace COM_TelegramBot
 //                find.ClearAllFuzzyOptions();
 //                find.MatchControl = true;
 //                Console.WriteLine(find.Execute()); 
+#endregion
+
+#region SaveImage
+
+
+//var image = System.Drawing.Image.FromStream(ms);
+//var pngTarget = Path.ChangeExtension(target, "png");
+//image.Save(pngTarget, ImageFormat.Png);
+
 #endregion
