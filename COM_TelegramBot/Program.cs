@@ -6,6 +6,7 @@ using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
@@ -17,63 +18,75 @@ namespace COM_TelegramBot
 {
     class Program
     {
-        public static Word.Application wordApp;
-        public static Document wordDoc;
+        public static Word.Application[] wordApps;
+        public static Document[] wordDocs;
 
-        public static List<int> pagesNumbersList = new List<int>();
+        public static List<int>[] pagesNumbersLists;
+
+        public static object syncObject = new object();
 
         public static DirectoryInfo dir = new DirectoryInfo(@"C:\Users\Mi\Desktop\bot\data");
-        public  static List<FileInfo> FileNames = new List<FileInfo>();
+        public static List<FileInfo> FileNames = new List<FileInfo>();
 
-        public static string strToSearhFor = "reklamacj";
+        public static string strToSearhFor = "grupa";
         public static void Main(string[] args)
         {
             dir.GetFiles().Where(fileInfo => !fileInfo.Name.Contains("~")).Foreach(fileInfo => FileNames.Add(fileInfo));
 
-            foreach (FileInfo fileName in FileNames)
+
+            wordApps = new Application[FileNames.Count];
+            wordDocs = new Document[FileNames.Count];
+            pagesNumbersLists = new List<int>[FileNames.Count];
+
+            Parallel.For(0, FileNames.Count, new ParallelOptions() { MaxDegreeOfParallelism = 3 }, (int q) =>
             {
                 try
                 {
-                    wordApp = new Word.Application();
-                    wordDoc = wordApp.Documents.OpenNoRepairDialog(FileName: fileName.FullName, ReadOnly: false);
+                    wordApps[q] = new Word.Application();
+                    wordDocs[q] = wordApps[q].Documents.OpenNoRepairDialog(FileName: FileNames[q].FullName, ReadOnly: false);
+                    pagesNumbersLists[q] = new List<int>();
 
-                    SearchInTextBox(strToSearhFor);
-                    SearchInParagraphs(strToSearhFor);
-                    ConvertDocToJpeg(strToSearhFor, fileName.Name, pagesNumbersList.ToArray());
+                    SearchInTextBox(strToSearhFor, q);
+                    SearchInParagraphs(strToSearhFor, q);
+                    ConvertDocToJpeg(strToSearhFor, FileNames[q].Name, q, pagesNumbersLists[q].ToArray());
 
-                    wordApp.Visible = false;
+                    wordApps[q].Visible = false;
                 }
                 finally
                 {
-                    wordDoc.Close(false);
-                    wordApp.Quit(false);
-                    pagesNumbersList.Clear();
+                    wordDocs[q].Close(false);
+                    wordApps[q].Quit(false);
+                    pagesNumbersLists[q].Clear();
                 }
-            }
+            });
+
             Console.WriteLine("finished");
             Console.ReadLine();
         }
 
-        public static void ConvertDocToJpeg(string searchWord, string fileName, params int[] pagesNumbersToBeConverted)
+        public static void ConvertDocToJpeg(string searchWord, string fileName, int threadNum, params int[] pagesNumbersToBeConverted)
         {
-            DirectoryInfo wordDir = dir.Parent.CreateSubdirectory(searchWord); //tmp
+            DirectoryInfo wordDir = dir.Parent.CreateSubdirectory(searchWord);
 
             foreach (int pageNumber in pagesNumbersToBeConverted)
             {
-                wordApp.Selection.GoTo(WdGoToItem.wdGoToPage, WdGoToDirection.wdGoToAbsolute, pageNumber);
+                wordApps[threadNum].Selection.GoTo(WdGoToItem.wdGoToPage, WdGoToDirection.wdGoToAbsolute, pageNumber);
 
-                var page = wordDoc.ActiveWindow.ActivePane.Pages[pageNumber];
+                var page = wordDocs[threadNum].ActiveWindow.ActivePane.Pages[pageNumber];
                 var bits = page.EnhMetaFileBits;
 
-                string target = wordDir.FullName + @"\" + searchWord + "_" + pageNumber +"_" + fileName;
-               
-                using (var ms = new MemoryStream((byte[])(bits)))
-                {
-                    Bitmap bitmap = new Bitmap(ms);
-                    
-                    var pngTarget = Path.ChangeExtension(target, "jpeg");
+                string target = wordDir.FullName + @"\" + searchWord + "_" + pageNumber + "_" + fileName;
 
-                    Transparent2Color(bitmap, Color.White).Save(pngTarget, ImageFormat.Jpeg);
+                lock (syncObject)
+                {
+                    using (var ms = new MemoryStream((byte[])(bits)))
+                    {
+                        Bitmap bitmap = new Bitmap(ms);
+
+                        var pngTarget = Path.ChangeExtension(target, "jpeg");
+
+                        Transparent2Color(bitmap, Color.White).Save(pngTarget, ImageFormat.Jpeg);
+                    }
                 }
             }
         }
@@ -81,6 +94,7 @@ namespace COM_TelegramBot
         public static Bitmap Transparent2Color(Bitmap bmp1, Color target)
         {
             Bitmap bmp2 = new Bitmap(bmp1.Width, bmp1.Height);
+
             Rectangle rect = new Rectangle(System.Drawing.Point.Empty, bmp1.Size);
             using (Graphics G = Graphics.FromImage(bmp2))
             {
@@ -88,11 +102,12 @@ namespace COM_TelegramBot
                 G.DrawImageUnscaledAndClipped(bmp1, rect);
             }
             return bmp2;
+
         }
 
-        public static void SearchInTextBox(string wordToSearchFor)
+        public static void SearchInTextBox(string wordToSearchFor, int threadNum)
         {
-            foreach (Shape shape in wordApp.ActiveDocument.Shapes)
+            foreach (Shape shape in wordApps[threadNum].ActiveDocument.Shapes)
             {
                 if (shape.TextFrame.HasText == -1 && shape.TextFrame.TextRange.Text.ToLower().Contains(wordToSearchFor))
                 {
@@ -103,50 +118,51 @@ namespace COM_TelegramBot
                     while (wordPosition > -1)
                     {
                         rang.Select();
-                        wordApp.Selection.MoveLeft(WdUnits.wdCharacter, 1, WdMovementType.wdMove);
-                        wordApp.Selection.MoveRight(WdUnits.wdCharacter, wordPosition, WdMovementType.wdMove);
-                        wordApp.Selection.MoveRight(WdUnits.wdCharacter, wordToSearchFor.Length, WdMovementType.wdExtend);
-                        wordApp.Selection.Range.HighlightColorIndex = WdColorIndex.wdYellow;
+                        wordApps[threadNum].Selection.MoveLeft(WdUnits.wdCharacter, 1, WdMovementType.wdMove);
+                        wordApps[threadNum].Selection.MoveRight(WdUnits.wdCharacter, wordPosition, WdMovementType.wdMove);
+                        wordApps[threadNum].Selection.MoveRight(WdUnits.wdCharacter, wordToSearchFor.Length, WdMovementType.wdExtend);
+                        wordApps[threadNum].Selection.Range.HighlightColorIndex = WdColorIndex.wdYellow;
 
                         wordPosition = rang.Text.ToLower().IndexOf(wordToSearchFor, wordPosition + wordToSearchFor.Length);
                     }
-                    AddPageTopagesNumberList();
+
+                    AddPageTopagesNumberList(threadNum);
                 }
             }
         }
 
-        public static void SearchInParagraphs(string wordToSearchFor)
+        public static void SearchInParagraphs(string wordToSearchFor, int threadNum)
         {
-            for (int i = 1; i <= wordDoc.Paragraphs.Count; i++)
+            for (int i = 1; i <= wordDocs[threadNum].Paragraphs.Count; i++)
             {
-                string parText = wordDoc.Paragraphs[i].Range.Text;
+                string parText = wordDocs[threadNum].Paragraphs[i].Range.Text;
                 if (parText.ToLower().Contains(wordToSearchFor))
                 {
                     int wordPosition = parText.ToLower().IndexOf(wordToSearchFor);
                     while (wordPosition > -1)
                     {
-                        wordDoc.Paragraphs[i].Range.Select();
-                        wordApp.Selection.MoveLeft(WdUnits.wdCharacter, 1, WdMovementType.wdMove);
+                        wordDocs[threadNum].Paragraphs[i].Range.Select();
+                        wordApps[threadNum].Selection.MoveLeft(WdUnits.wdCharacter, 1, WdMovementType.wdMove);
 
-                        wordApp.Selection.MoveRight(WdUnits.wdCharacter, wordPosition, WdMovementType.wdMove);
-                        wordApp.Selection.MoveRight(WdUnits.wdCharacter, wordToSearchFor.Length, WdMovementType.wdExtend);
-                        wordApp.Selection.Range.HighlightColorIndex = WdColorIndex.wdYellow;
+                        wordApps[threadNum].Selection.MoveRight(WdUnits.wdCharacter, wordPosition, WdMovementType.wdMove);
+                        wordApps[threadNum].Selection.MoveRight(WdUnits.wdCharacter, wordToSearchFor.Length, WdMovementType.wdExtend);
+                        wordApps[threadNum].Selection.Range.HighlightColorIndex = WdColorIndex.wdYellow;
 
                         wordPosition = parText.ToLower().IndexOf(wordToSearchFor, wordPosition + wordToSearchFor.Length); ;
                     }
-                    AddPageTopagesNumberList();
+
+                    AddPageTopagesNumberList(threadNum);
                 }
             }
         }
 
-        public static void AddPageTopagesNumberList()
+        public static void AddPageTopagesNumberList(int threadNum)
         {
-            int currentPageNumber = wordApp.Selection.Information[WdInformation.wdActiveEndPageNumber];
-            if (!pagesNumbersList.Contains(currentPageNumber))
+            int currentPageNumber = wordApps[threadNum].Selection.Information[WdInformation.wdActiveEndPageNumber];
+            if (!pagesNumbersLists[threadNum].Contains(currentPageNumber))
             {
-                pagesNumbersList.Add(currentPageNumber);
+                pagesNumbersLists[threadNum].Add(currentPageNumber);
             }
-                
         }
     }
 }
