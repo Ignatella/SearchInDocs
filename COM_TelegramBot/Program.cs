@@ -97,18 +97,24 @@ namespace COM_TelegramBot
                 if (shape.TextFrame.HasText == -1 && shape.TextFrame.TextRange.Text.ToLower().Contains(wordToSearchFor))
                 {
                     Range rang = shape.TextFrame.TextRange;
-                    int wordPosition = shape.TextFrame.TextRange.Text.IndexOf(wordToSearchFor);
-                    rang.Select();
-                    wordApp.Selection.HomeKey(WdUnits.wdLine, WdMovementType.wdMove);
-                    wordApp.Selection.MoveRight(WdUnits.wdCharacter, wordPosition, WdMovementType.wdMove);
-                    wordApp.Selection.MoveRight(WdUnits.wdWord, 1, WdMovementType.wdExtend);
-                    wordApp.Selection.Range.HighlightColorIndex = WdColorIndex.wdYellow;
+                    string textFrameText = rang.Text.ToLower();
+                    int wordPosition = rang.Text.ToLower().IndexOf(wordToSearchFor);
 
+                    while (wordPosition > -1)
+                    {
+                        rang.Select();
+                        wordApp.Selection.MoveLeft(WdUnits.wdCharacter, 1, WdMovementType.wdMove);
+                        wordApp.Selection.MoveRight(WdUnits.wdCharacter, wordPosition, WdMovementType.wdMove);
+                        wordApp.Selection.MoveRight(WdUnits.wdCharacter, wordToSearchFor.Length, WdMovementType.wdExtend);
+                        wordApp.Selection.Range.HighlightColorIndex = WdColorIndex.wdYellow;
+
+                        wordPosition = rang.Text.ToLower().IndexOf(wordToSearchFor, wordPosition + wordToSearchFor.Length);
+                    }
                     AddPageTopagesNumberList();
                 }
             }
         }
-       
+
         public static void SearchInParagraphs(string wordToSearchFor)
         {
             for (int i = 1; i <= wordDoc.Paragraphs.Count; i++)
@@ -117,12 +123,17 @@ namespace COM_TelegramBot
                 if (parText.ToLower().Contains(wordToSearchFor))
                 {
                     int wordPosition = parText.ToLower().IndexOf(wordToSearchFor);
-                    wordApp.Selection.HomeKey(WdUnits.wdStory, WdMovementType.wdMove);
-                    wordApp.Selection.MoveDown(WdUnits.wdParagraph, i - 1, WdMovementType.wdMove);
-                    wordApp.Selection.MoveRight(WdUnits.wdCharacter, wordPosition, WdMovementType.wdMove);
-                    wordApp.Selection.MoveRight(WdUnits.wdWord, 1, WdMovementType.wdExtend);
-                    wordApp.Selection.Range.HighlightColorIndex = WdColorIndex.wdYellow;
+                    while (wordPosition > -1)
+                    {
+                        wordDoc.Paragraphs[i].Range.Select();
+                        wordApp.Selection.MoveLeft(WdUnits.wdCharacter, 1, WdMovementType.wdMove);
 
+                        wordApp.Selection.MoveRight(WdUnits.wdCharacter, wordPosition, WdMovementType.wdMove);
+                        wordApp.Selection.MoveRight(WdUnits.wdCharacter, wordToSearchFor.Length, WdMovementType.wdExtend);
+                        wordApp.Selection.Range.HighlightColorIndex = WdColorIndex.wdYellow;
+
+                        wordPosition = parText.ToLower().IndexOf(wordToSearchFor, wordPosition + wordToSearchFor.Length); ;
+                    }
                     AddPageTopagesNumberList();
                 }
             }
