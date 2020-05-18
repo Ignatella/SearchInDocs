@@ -28,11 +28,10 @@ namespace COM_TelegramBot
         public static DirectoryInfo dir = new DirectoryInfo(@"C:\Users\Mi\Desktop\bot\data");
         public static List<FileInfo> FileNames = new List<FileInfo>();
 
-        public static string strToSearhFor = "grupa";
+        public static string strToSearhFor = "a";
         public static void Main(string[] args)
         {
             dir.GetFiles().Where(fileInfo => !fileInfo.Name.Contains("~")).Foreach(fileInfo => FileNames.Add(fileInfo));
-
 
             wordApps = new Application[FileNames.Count];
             wordDocs = new Document[FileNames.Count];
@@ -43,7 +42,8 @@ namespace COM_TelegramBot
                 try
                 {
                     wordApps[q] = new Word.Application();
-                    wordDocs[q] = wordApps[q].Documents.OpenNoRepairDialog(FileName: FileNames[q].FullName, ReadOnly: false);
+                    wordDocs[q] = wordApps[q].Documents.OpenNoRepairDialog(FileName: FileNames[q].FullName, ReadOnly: false, 
+                        AddToRecentFiles: false);
                     pagesNumbersLists[q] = new List<int>();
 
                     SearchInTextBox(strToSearhFor, q);
@@ -62,47 +62,6 @@ namespace COM_TelegramBot
 
             Console.WriteLine("finished");
             Console.ReadLine();
-        }
-
-        public static void ConvertDocToJpeg(string searchWord, string fileName, int threadNum, params int[] pagesNumbersToBeConverted)
-        {
-            DirectoryInfo wordDir = dir.Parent.CreateSubdirectory(searchWord);
-
-            foreach (int pageNumber in pagesNumbersToBeConverted)
-            {
-                wordApps[threadNum].Selection.GoTo(WdGoToItem.wdGoToPage, WdGoToDirection.wdGoToAbsolute, pageNumber);
-
-                var page = wordDocs[threadNum].ActiveWindow.ActivePane.Pages[pageNumber];
-                var bits = page.EnhMetaFileBits;
-
-                string target = wordDir.FullName + @"\" + searchWord + "_" + pageNumber + "_" + fileName;
-
-                lock (syncObject)
-                {
-                    using (var ms = new MemoryStream((byte[])(bits)))
-                    {
-                        Bitmap bitmap = new Bitmap(ms);
-
-                        var pngTarget = Path.ChangeExtension(target, "jpeg");
-
-                        Transparent2Color(bitmap, Color.White).Save(pngTarget, ImageFormat.Jpeg);
-                    }
-                }
-            }
-        }
-
-        public static Bitmap Transparent2Color(Bitmap bmp1, Color target)
-        {
-            Bitmap bmp2 = new Bitmap(bmp1.Width, bmp1.Height);
-
-            Rectangle rect = new Rectangle(System.Drawing.Point.Empty, bmp1.Size);
-            using (Graphics G = Graphics.FromImage(bmp2))
-            {
-                G.Clear(target);
-                G.DrawImageUnscaledAndClipped(bmp1, rect);
-            }
-            return bmp2;
-
         }
 
         public static void SearchInTextBox(string wordToSearchFor, int threadNum)
@@ -163,6 +122,50 @@ namespace COM_TelegramBot
             {
                 pagesNumbersLists[threadNum].Add(currentPageNumber);
             }
+        }
+
+        public static void ConvertDocToJpeg(string searchWord, string fileName, int threadNum, params int[] pagesNumbersToBeConverted)
+        {
+            DirectoryInfo wordDir = dir.Parent.CreateSubdirectory(searchWord);
+
+            foreach (int pageNumber in pagesNumbersToBeConverted)
+            {
+                wordApps[threadNum].Selection.GoTo(WdGoToItem.wdGoToPage, WdGoToDirection.wdGoToAbsolute, pageNumber);
+
+                var page = wordDocs[threadNum].ActiveWindow.ActivePane.Pages[pageNumber];
+                var bits = page.EnhMetaFileBits;
+
+                string target = wordDir.FullName + @"\" + searchWord + "_" + pageNumber + "_" + fileName;
+
+                lock (syncObject)
+                {
+                    using (var ms = new MemoryStream((byte[])(bits)))
+                    {
+                        using (Bitmap bmp1 = new Bitmap(ms))
+                        {
+                            var pngTarget = Path.ChangeExtension(target, "jpeg");
+
+                            using (Bitmap bmp2 = new Bitmap(bmp1.Width, bmp1.Height))
+                            {
+                                Transparent2Color(bmp1, bmp2, Color.White).Save(pngTarget, ImageFormat.Jpeg);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        public static Bitmap Transparent2Color(Bitmap bmp1, Bitmap bmp2, Color target)
+        {
+            //Bitmap bmp2 = new Bitmap(bmp1.Width, bmp1.Height);
+
+            Rectangle rect = new Rectangle(System.Drawing.Point.Empty, bmp1.Size);
+            using (Graphics G = Graphics.FromImage(bmp2))
+            {
+                G.Clear(target);
+                G.DrawImageUnscaledAndClipped(bmp1, rect);
+            }
+            return bmp2;
         }
     }
 }
