@@ -27,8 +27,8 @@ namespace COM_TelegramBot
 
         public static string strToSearhFor = "reklamacj";
         public static void Main(string[] args)
-        { 
-            dir.GetFiles().Foreach(fileInfo => FileNames.Add(fileInfo));
+        {
+            dir.GetFiles().Where(fileInfo => !fileInfo.Name.Contains("~")).Foreach(fileInfo => FileNames.Add(fileInfo));
 
             foreach (FileInfo fileName in FileNames)
             {
