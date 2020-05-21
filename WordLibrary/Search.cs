@@ -1,54 +1,52 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
+﻿using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices;
-using System.Text;
 using System.Threading.Tasks;
-using System.Xml.Linq;
 using Microsoft.Office.Interop.Word;
 using Rectangle = System.Drawing.Rectangle;
 using Word = Microsoft.Office.Interop.Word;
 
-namespace COM_TelegramBot
+namespace WordLibrary
 {
-    class Program
+    public static class Search
     {
-        public static Word.Application[] wordApps;
-        public static Document[] wordDocs;
+        private static object syncObject = new object();
 
-        public static List<int>[] pagesNumbersLists;
+        private static Word.Application[] wordApps { get; set; }
+        private static Document[] wordDocs { get; set; }
+        private static List<int>[] pagesNumbersLists { get; set; }
+        private static DirectoryInfo dir { get; set; } 
+        private static List<FileInfo> FileNames { get; set; }
+        private static string strToSearchFor { get; set; }
 
-        public static object syncObject = new object();
-
-        public static DirectoryInfo dir = new DirectoryInfo(@"C:\Users\Mi\Desktop\bot\data");
-        public static List<FileInfo> FileNames = new List<FileInfo>();
-
-        public static string strToSearhFor = "a";
-        public static void Main(string[] args)
+        public static void SearchInFilesAndConvertPagesToJpg(string strToSearchFor, string path)
         {
+            dir = new DirectoryInfo(path);
+            Search.strToSearchFor = strToSearchFor;
+
+
+            FileNames = new List<FileInfo>();
             dir.GetFiles().Where(fileInfo => !fileInfo.Name.Contains("~")).Foreach(fileInfo => FileNames.Add(fileInfo));
+
 
             wordApps = new Application[FileNames.Count];
             wordDocs = new Document[FileNames.Count];
             pagesNumbersLists = new List<int>[FileNames.Count];
-
+         
             Parallel.For(0, FileNames.Count, new ParallelOptions() { MaxDegreeOfParallelism = 3 }, (int q) =>
             {
                 try
                 {
                     wordApps[q] = new Word.Application();
-                    wordDocs[q] = wordApps[q].Documents.OpenNoRepairDialog(FileName: FileNames[q].FullName, ReadOnly: false, 
+                    wordDocs[q] = wordApps[q].Documents.OpenNoRepairDialog(FileName: FileNames[q].FullName, ReadOnly: false,
                         AddToRecentFiles: false);
                     pagesNumbersLists[q] = new List<int>();
 
-                    SearchInTextBox(strToSearhFor, q);
-                    SearchInParagraphs(strToSearhFor, q);
-                    ConvertDocToJpeg(strToSearhFor, FileNames[q].Name, q, pagesNumbersLists[q].ToArray());
+                    SearchInTextBox(Search.strToSearchFor, q);
+                    SearchInParagraphs(Search.strToSearchFor, q);
+                    ConvertDocToJpeg(Search.strToSearchFor, FileNames[q].Name, q, pagesNumbersLists[q].ToArray());
 
                     wordApps[q].Visible = false;
                 }
@@ -59,12 +57,9 @@ namespace COM_TelegramBot
                     pagesNumbersLists[q].Clear();
                 }
             });
-
-            Console.WriteLine("finished");
-            Console.ReadLine();
         }
 
-        public static void SearchInTextBox(string wordToSearchFor, int threadNum)
+        private static void SearchInTextBox(string wordToSearchFor, int threadNum)
         {
             foreach (Shape shape in wordApps[threadNum].ActiveDocument.Shapes)
             {
@@ -90,7 +85,7 @@ namespace COM_TelegramBot
             }
         }
 
-        public static void SearchInParagraphs(string wordToSearchFor, int threadNum)
+        private static void SearchInParagraphs(string wordToSearchFor, int threadNum)
         {
             for (int i = 1; i <= wordDocs[threadNum].Paragraphs.Count; i++)
             {
@@ -115,7 +110,7 @@ namespace COM_TelegramBot
             }
         }
 
-        public static void AddPageTopagesNumberList(int threadNum)
+        private static void AddPageTopagesNumberList(int threadNum)
         {
             int currentPageNumber = wordApps[threadNum].Selection.Information[WdInformation.wdActiveEndPageNumber];
             if (!pagesNumbersLists[threadNum].Contains(currentPageNumber))
@@ -124,7 +119,7 @@ namespace COM_TelegramBot
             }
         }
 
-        public static void ConvertDocToJpeg(string searchWord, string fileName, int threadNum, params int[] pagesNumbersToBeConverted)
+        private static void ConvertDocToJpeg(string searchWord, string fileName, int threadNum, params int[] pagesNumbersToBeConverted)
         {
             DirectoryInfo wordDir = dir.Parent.CreateSubdirectory(searchWord);
 
@@ -155,10 +150,8 @@ namespace COM_TelegramBot
             }
         }
 
-        public static Bitmap Transparent2Color(Bitmap bmp1, Bitmap bmp2, Color target)
+        private static Bitmap Transparent2Color(Bitmap bmp1, Bitmap bmp2, Color target)
         {
-            //Bitmap bmp2 = new Bitmap(bmp1.Width, bmp1.Height);
-
             Rectangle rect = new Rectangle(System.Drawing.Point.Empty, bmp1.Size);
             using (Graphics G = Graphics.FromImage(bmp2))
             {
@@ -169,22 +162,3 @@ namespace COM_TelegramBot
         }
     }
 }
-
-#region FindTheWordInText
-//Word.Range range = wordApp.ActiveDocument.Content;
-//Word.Find find = range.Find;
-//find.Text = "xxx";
-//                find.ClearFormatting();
-//                find.ClearAllFuzzyOptions();
-//                find.MatchControl = true;
-//                Console.WriteLine(find.Execute()); 
-#endregion
-
-#region SaveImage
-
-
-//var image = System.Drawing.Image.FromStream(ms);
-//var pngTarget = Path.ChangeExtension(target, "png");
-//image.Save(pngTarget, ImageFormat.Png);
-
-#endregion

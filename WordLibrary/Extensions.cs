@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace COM_TelegramBot
+namespace WordLibrary
 {
     public static class Extensions
     {
