@@ -1,8 +1,14 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
+using System.Net;
+using System.Net.Sockets;
+using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using Microsoft.Office.Interop.Word;
 using Rectangle = System.Drawing.Rectangle;
@@ -12,6 +18,8 @@ namespace WordLibrary
 {
     public static class Search
     {
+        private static readonly string[] supportedFileExtensions = { ".doc", ".docx" };
+
         private static object syncObject = new object();
 
         private static Word.Application[] wordApps { get; set; }
@@ -21,6 +29,9 @@ namespace WordLibrary
         private static List<FileInfo> FileNames { get; set; }
         private static string strToSearchFor { get; set; }
 
+        public static event EventHandler<ErrorOccuredEventArgs> ErrorOccured;
+        public static event EventHandler<FileIsProcessedEventArgs> FileIsProcessed;
+
         public static void SearchInFilesAndConvertPagesToJpg(string strToSearchFor, string path)
         {
             dir = new DirectoryInfo(path);
@@ -28,7 +39,9 @@ namespace WordLibrary
 
 
             FileNames = new List<FileInfo>();
-            dir.GetFiles().Where(fileInfo => !fileInfo.Name.Contains("~")).Foreach(fileInfo => FileNames.Add(fileInfo));
+            dir.GetFiles().Where(fileInfo => !fileInfo.Name.Contains("~") &&
+                supportedFileExtensions.Contains(fileInfo.Extension))
+                    .Foreach(fileInfo => FileNames.Add(fileInfo));
 
 
             wordApps = new Application[FileNames.Count];
@@ -50,11 +63,17 @@ namespace WordLibrary
 
                     wordApps[q].Visible = false;
                 }
+                catch (Exception ex)
+                {
+                    ErrorOccured?.Invoke(null, new ErrorOccuredEventArgs(FileNames[q].Name, ex));
+                }
                 finally
                 {
                     wordDocs[q].Close(false);
                     wordApps[q].Quit(false);
                     pagesNumbersLists[q].Clear();
+
+                    FileIsProcessed?.Invoke(null, new FileIsProcessedEventArgs(FileNames[q].Name));
                 }
             });
         }
