@@ -28,8 +28,6 @@ namespace SearchInDocs_WF
         {
         }
 
-        
-
         private void Main_menu_panel_MouseMove(object sender, MouseEventArgs e)
         {
             if (e.Button == MouseButtons.Left)
@@ -45,5 +43,15 @@ namespace SearchInDocs_WF
 
         private void MinimizeTheApp(object sender, EventArgs e) => this.WindowState = FormWindowState.Minimized;
 
+        private void select_btn_Click(object sender, EventArgs e)
+        {
+            using (FolderBrowserDialog folder = new FolderBrowserDialog())
+            {
+                if (folder.ShowDialog() == DialogResult.OK)
+                    dir_txtBox.Text = folder.SelectedPath;
+            }
+            dir_txtBox.SelectAll();
+            dir_txtBox.ScrollToCaret();
+        }
     }
 }

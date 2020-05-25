@@ -38,8 +38,8 @@
             this.groupBox3 = new System.Windows.Forms.GroupBox();
             this.textBox2 = new System.Windows.Forms.TextBox();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
-            this.textBox1 = new System.Windows.Forms.TextBox();
-            this.button1 = new System.Windows.Forms.Button();
+            this.dir_txtBox = new System.Windows.Forms.TextBox();
+            this.select_btn = new System.Windows.Forms.Button();
             this.tabPage2 = new System.Windows.Forms.TabPage();
             this.groupBox6 = new System.Windows.Forms.GroupBox();
             this.label4 = new System.Windows.Forms.Label();
@@ -171,8 +171,8 @@
             // 
             // groupBox1
             // 
-            this.groupBox1.Controls.Add(this.textBox1);
-            this.groupBox1.Controls.Add(this.button1);
+            this.groupBox1.Controls.Add(this.dir_txtBox);
+            this.groupBox1.Controls.Add(this.select_btn);
             this.groupBox1.ForeColor = System.Drawing.Color.Black;
             this.groupBox1.Location = new System.Drawing.Point(3, 23);
             this.groupBox1.Name = "groupBox1";
@@ -181,24 +181,25 @@
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Directory";
             // 
-            // textBox1
+            // dir_txtBox
             // 
-            this.textBox1.BackColor = System.Drawing.Color.White;
-            this.textBox1.Location = new System.Drawing.Point(9, 21);
-            this.textBox1.Name = "textBox1";
-            this.textBox1.Size = new System.Drawing.Size(312, 22);
-            this.textBox1.TabIndex = 1;
-            this.textBox1.Tag = "";
+            this.dir_txtBox.BackColor = System.Drawing.Color.White;
+            this.dir_txtBox.Location = new System.Drawing.Point(9, 21);
+            this.dir_txtBox.Name = "dir_txtBox";
+            this.dir_txtBox.Size = new System.Drawing.Size(312, 22);
+            this.dir_txtBox.TabIndex = 1;
+            this.dir_txtBox.Tag = "";
             // 
-            // button1
+            // select_btn
             // 
-            this.button1.ForeColor = System.Drawing.Color.Black;
-            this.button1.Location = new System.Drawing.Point(327, 13);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(85, 37);
-            this.button1.TabIndex = 0;
-            this.button1.Text = "Select";
-            this.button1.UseVisualStyleBackColor = true;
+            this.select_btn.ForeColor = System.Drawing.Color.Black;
+            this.select_btn.Location = new System.Drawing.Point(327, 13);
+            this.select_btn.Name = "select_btn";
+            this.select_btn.Size = new System.Drawing.Size(85, 37);
+            this.select_btn.TabIndex = 0;
+            this.select_btn.Text = "Select";
+            this.select_btn.UseVisualStyleBackColor = true;
+            this.select_btn.Click += new System.EventHandler(this.select_btn_Click);
             // 
             // tabPage2
             // 
@@ -462,8 +463,8 @@
         private System.Windows.Forms.TabPage tabPage2;
         private System.Windows.Forms.TabPage tabPage1;
         private System.Windows.Forms.GroupBox groupBox1;
-        private System.Windows.Forms.Button button1;
-        private System.Windows.Forms.TextBox textBox1;
+        private System.Windows.Forms.Button select_btn;
+        private System.Windows.Forms.TextBox dir_txtBox;
         private System.Windows.Forms.GroupBox groupBox3;
         private System.Windows.Forms.TextBox textBox2;
         private System.Windows.Forms.Button start_btn;
