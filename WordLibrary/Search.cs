@@ -1,16 +1,12 @@
-﻿using System;
+﻿using Microsoft.Office.Interop.Word;
+using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
-using System.Net;
-using System.Net.Sockets;
-using System.Runtime.InteropServices;
 using System.Threading.Tasks;
-using Microsoft.Office.Interop.Word;
 using Rectangle = System.Drawing.Rectangle;
 using Word = Microsoft.Office.Interop.Word;
 
@@ -25,8 +21,8 @@ namespace WordLibrary
         private static Word.Application[] wordApps { get; set; }
         private static Document[] wordDocs { get; set; }
         private static List<int>[] pagesNumbersLists { get; set; }
-        private static DirectoryInfo dir { get; set; } 
-        private static List<FileInfo> FileNames { get; set; }
+        private static DirectoryInfo dir { get; set; }
+        private static List<FileInfo> Files { get; set; }
         private static string strToSearchFor { get; set; }
 
         public static event EventHandler<ErrorOccuredEventArgs> ErrorOccured;
@@ -38,34 +34,39 @@ namespace WordLibrary
             Search.strToSearchFor = strToSearchFor;
 
 
-            FileNames = new List<FileInfo>();
+            Files = new List<FileInfo>();
             dir.GetFiles().Where(fileInfo => !fileInfo.Name.Contains("~") &&
                 supportedFileExtensions.Contains(fileInfo.Extension))
-                    .Foreach(fileInfo => FileNames.Add(fileInfo));
+                    .Foreach(fileInfo => Files.Add(fileInfo));
 
 
-            wordApps = new Application[FileNames.Count];
-            wordDocs = new Document[FileNames.Count];
-            pagesNumbersLists = new List<int>[FileNames.Count];
-         
-            Parallel.For(0, FileNames.Count, new ParallelOptions() { MaxDegreeOfParallelism = 3 }, (int q) =>
+            wordApps = new Application[Files.Count];
+            wordDocs = new Document[Files.Count];
+            pagesNumbersLists = new List<int>[Files.Count];
+
+            KillAllRequiredWordProcesses();
+
+            Parallel.For(0, Files.Count, new ParallelOptions()
+            {
+                MaxDegreeOfParallelism = 3
+            }, (int q) =>
             {
                 try
                 {
                     wordApps[q] = new Word.Application();
-                    wordDocs[q] = wordApps[q].Documents.OpenNoRepairDialog(FileName: FileNames[q].FullName, ReadOnly: false,
-                        AddToRecentFiles: false);
+                    wordDocs[q] = wordApps[q].Documents.OpenNoRepairDialog(FileName: Files[q].FullName, ReadOnly: false,
+                    AddToRecentFiles: false);
                     pagesNumbersLists[q] = new List<int>();
 
                     SearchInTextBox(Search.strToSearchFor, q);
                     SearchInParagraphs(Search.strToSearchFor, q);
-                    ConvertDocToJpeg(Search.strToSearchFor, FileNames[q].Name, q, pagesNumbersLists[q].ToArray());
+                    ConvertDocToJpeg(Search.strToSearchFor, Files[q].Name, q, pagesNumbersLists[q].ToArray());
 
                     wordApps[q].Visible = false;
                 }
                 catch (Exception ex)
                 {
-                    ErrorOccured?.Invoke(null, new ErrorOccuredEventArgs(FileNames[q].Name, ex));
+                    ErrorOccured?.Invoke(null, new ErrorOccuredEventArgs(Files[q].Name, ex));
                 }
                 finally
                 {
@@ -73,11 +74,12 @@ namespace WordLibrary
                     wordApps[q].Quit(false);
                     pagesNumbersLists[q].Clear();
 
-                    FileIsProcessed?.Invoke(null, new FileIsProcessedEventArgs(FileNames[q].Name));
+                    FileIsProcessed?.Invoke(null, new FileIsProcessedEventArgs(Files[q].Name));
                 }
             });
+               
+            KillAllRequiredWordProcesses();
         }
-
         private static void SearchInTextBox(string wordToSearchFor, int threadNum)
         {
             foreach (Shape shape in wordApps[threadNum].ActiveDocument.Shapes)
@@ -100,6 +102,28 @@ namespace WordLibrary
                     }
 
                     AddPageTopagesNumberList(threadNum);
+                }
+            }
+        }
+
+        private static void KillAllRequiredWordProcesses() //not the best solution
+        {
+            Process[] processes = Process.GetProcesses(".")
+                .Where(process => process.ProcessName.ToLower().Contains("word")).ToArray();
+
+            //kill if no window or if required file is opened by user.
+            foreach (FileInfo file in Files)
+            {
+                foreach (Process process in processes
+                    .Where(process => !process.HasExited && (process.MainWindowHandle == new IntPtr(0) ||
+                        process.MainWindowTitle.Contains(file.Name))))
+                {
+                    try
+                    {
+                        process.Kill();
+                        break;
+                    }
+                    catch { }
                 }
             }
         }
