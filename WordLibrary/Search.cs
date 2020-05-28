@@ -6,6 +6,7 @@ using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Rectangle = System.Drawing.Rectangle;
 using Word = Microsoft.Office.Interop.Word;
@@ -17,7 +18,7 @@ namespace WordLibrary
         private static readonly string[] supportedFileExtensions = { ".doc", ".docx" };
 
         private static object syncObject = new object();
-
+        private static CancellationTokenSource cancellationToken = new CancellationTokenSource();
         private static Word.Application[] wordApps { get; set; }
         private static Document[] wordDocs { get; set; }
         private static List<int>[] pagesNumbersLists { get; set; }
@@ -46,40 +47,57 @@ namespace WordLibrary
 
             KillAllRequiredWordProcesses();
 
-            Parallel.For(0, Files.Count, new ParallelOptions()
+            try 
+            { 
+
+                Parallel.For(0, Files.Count, new ParallelOptions()
+                {
+                    MaxDegreeOfParallelism = 3,
+                    CancellationToken = cancellationToken.Token
+                }, (int q) =>
+                {
+                    try
+                    {
+                        wordApps[q] = new Word.Application();
+                        wordDocs[q] = wordApps[q].Documents.OpenNoRepairDialog(FileName: Files[q].FullName, ReadOnly: false,
+                        AddToRecentFiles: false);
+                        pagesNumbersLists[q] = new List<int>();
+
+                        SearchInTextBox(Search.strToSearchFor, q);
+                        SearchInParagraphs(Search.strToSearchFor, q);
+                        ConvertDocToJpeg(Search.strToSearchFor, Files[q].Name, q, pagesNumbersLists[q].ToArray());
+
+                        wordApps[q].Visible = false;
+                    }
+                    catch (Exception ex)
+                    {
+                        ErrorOccured?.Invoke(null, new ErrorOccuredEventArgs(Files[q].Name, ex));
+                    }
+                    finally
+                    {
+                        wordDocs[q].Close(false);
+                        wordApps[q].Quit(false);
+                        pagesNumbersLists[q].Clear();
+
+                        FileIsProcessed?.Invoke(null, new FileIsProcessedEventArgs(Files[q].Name));
+                    }
+
+                });
+            }
+            catch(OperationCanceledException) { }
+            finally
             {
-                MaxDegreeOfParallelism = 3
-            }, (int q) =>
-            {
-                try
-                {
-                    wordApps[q] = new Word.Application();
-                    wordDocs[q] = wordApps[q].Documents.OpenNoRepairDialog(FileName: Files[q].FullName, ReadOnly: false,
-                    AddToRecentFiles: false);
-                    pagesNumbersLists[q] = new List<int>();
+                cancellationToken.Dispose();
+            }
 
-                    SearchInTextBox(Search.strToSearchFor, q);
-                    SearchInParagraphs(Search.strToSearchFor, q);
-                    ConvertDocToJpeg(Search.strToSearchFor, Files[q].Name, q, pagesNumbersLists[q].ToArray());
-
-                    wordApps[q].Visible = false;
-                }
-                catch (Exception ex)
-                {
-                    ErrorOccured?.Invoke(null, new ErrorOccuredEventArgs(Files[q].Name, ex));
-                }
-                finally
-                {
-                    wordDocs[q].Close(false);
-                    wordApps[q].Quit(false);
-                    pagesNumbersLists[q].Clear();
-
-                    FileIsProcessed?.Invoke(null, new FileIsProcessedEventArgs(Files[q].Name));
-                }
-            });
-               
             KillAllRequiredWordProcesses();
         }
+
+        public static void Cancel()
+        {
+            cancellationToken.Cancel();
+        }
+
         private static void SearchInTextBox(string wordToSearchFor, int threadNum)
         {
             foreach (Shape shape in wordApps[threadNum].ActiveDocument.Shapes)
