@@ -32,11 +32,11 @@
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
             this.tabPage1 = new System.Windows.Forms.TabPage();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
-            this.checkBox1 = new System.Windows.Forms.CheckBox();
+            this.agree_checkBox = new System.Windows.Forms.CheckBox();
             this.start_btn = new System.Windows.Forms.Button();
             this.button2 = new System.Windows.Forms.Button();
             this.groupBox3 = new System.Windows.Forms.GroupBox();
-            this.textBox2 = new System.Windows.Forms.TextBox();
+            this.word_txtBox = new System.Windows.Forms.TextBox();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.dir_txtBox = new System.Windows.Forms.TextBox();
             this.select_btn = new System.Windows.Forms.Button();
@@ -48,7 +48,7 @@
             this.radioButton1 = new System.Windows.Forms.RadioButton();
             this.groupBox5 = new System.Windows.Forms.GroupBox();
             this.button4 = new System.Windows.Forms.Button();
-            this.button5 = new System.Windows.Forms.Button();
+            this.cancel_btn = new System.Windows.Forms.Button();
             this.groupBox4 = new System.Windows.Forms.GroupBox();
             this.textBox3 = new System.Windows.Forms.TextBox();
             this.button3 = new System.Windows.Forms.Button();
@@ -99,7 +99,7 @@
             // 
             // groupBox2
             // 
-            this.groupBox2.Controls.Add(this.checkBox1);
+            this.groupBox2.Controls.Add(this.agree_checkBox);
             this.groupBox2.Controls.Add(this.start_btn);
             this.groupBox2.Controls.Add(this.button2);
             this.groupBox2.ForeColor = System.Drawing.Color.Black;
@@ -110,15 +110,15 @@
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "Action";
             // 
-            // checkBox1
+            // agree_checkBox
             // 
-            this.checkBox1.AutoSize = true;
-            this.checkBox1.Location = new System.Drawing.Point(9, 32);
-            this.checkBox1.Name = "checkBox1";
-            this.checkBox1.Size = new System.Drawing.Size(370, 21);
-            this.checkBox1.TabIndex = 5;
-            this.checkBox1.Text = "All required word files will be closed WITHOUT saving ";
-            this.checkBox1.UseVisualStyleBackColor = true;
+            this.agree_checkBox.AutoSize = true;
+            this.agree_checkBox.Location = new System.Drawing.Point(9, 32);
+            this.agree_checkBox.Name = "agree_checkBox";
+            this.agree_checkBox.Size = new System.Drawing.Size(370, 21);
+            this.agree_checkBox.TabIndex = 5;
+            this.agree_checkBox.Text = "All required word files will be closed WITHOUT saving ";
+            this.agree_checkBox.UseVisualStyleBackColor = true;
             // 
             // start_btn
             // 
@@ -134,6 +134,7 @@
             this.start_btn.TabIndex = 0;
             this.start_btn.Text = "Start";
             this.start_btn.UseVisualStyleBackColor = false;
+            this.start_btn.Click += new System.EventHandler(this.start_btn_Click);
             // 
             // button2
             // 
@@ -153,7 +154,7 @@
             // 
             // groupBox3
             // 
-            this.groupBox3.Controls.Add(this.textBox2);
+            this.groupBox3.Controls.Add(this.word_txtBox);
             this.groupBox3.ForeColor = System.Drawing.Color.Black;
             this.groupBox3.Location = new System.Drawing.Point(3, 88);
             this.groupBox3.Name = "groupBox3";
@@ -162,12 +163,12 @@
             this.groupBox3.TabStop = false;
             this.groupBox3.Text = "Word";
             // 
-            // textBox2
+            // word_txtBox
             // 
-            this.textBox2.Location = new System.Drawing.Point(9, 21);
-            this.textBox2.Name = "textBox2";
-            this.textBox2.Size = new System.Drawing.Size(400, 22);
-            this.textBox2.TabIndex = 0;
+            this.word_txtBox.Location = new System.Drawing.Point(9, 21);
+            this.word_txtBox.Name = "word_txtBox";
+            this.word_txtBox.Size = new System.Drawing.Size(400, 22);
+            this.word_txtBox.TabIndex = 0;
             // 
             // groupBox1
             // 
@@ -270,7 +271,7 @@
             // groupBox5
             // 
             this.groupBox5.Controls.Add(this.button4);
-            this.groupBox5.Controls.Add(this.button5);
+            this.groupBox5.Controls.Add(this.cancel_btn);
             this.groupBox5.ForeColor = System.Drawing.Color.Black;
             this.groupBox5.Location = new System.Drawing.Point(3, 203);
             this.groupBox5.Name = "groupBox5";
@@ -294,20 +295,20 @@
             this.button4.Text = "Convert";
             this.button4.UseVisualStyleBackColor = false;
             // 
-            // button5
+            // cancel_btn
             // 
-            this.button5.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(211)))), ((int)(((byte)(95)))), ((int)(((byte)(90)))));
-            this.button5.Enabled = false;
-            this.button5.FlatAppearance.BorderColor = System.Drawing.Color.Black;
-            this.button5.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.button5.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.button5.ForeColor = System.Drawing.Color.Black;
-            this.button5.Location = new System.Drawing.Point(238, 28);
-            this.button5.Name = "button5";
-            this.button5.Size = new System.Drawing.Size(114, 40);
-            this.button5.TabIndex = 4;
-            this.button5.Text = "Cancel";
-            this.button5.UseVisualStyleBackColor = false;
+            this.cancel_btn.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(211)))), ((int)(((byte)(95)))), ((int)(((byte)(90)))));
+            this.cancel_btn.Enabled = false;
+            this.cancel_btn.FlatAppearance.BorderColor = System.Drawing.Color.Black;
+            this.cancel_btn.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.cancel_btn.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.cancel_btn.ForeColor = System.Drawing.Color.Black;
+            this.cancel_btn.Location = new System.Drawing.Point(238, 28);
+            this.cancel_btn.Name = "cancel_btn";
+            this.cancel_btn.Size = new System.Drawing.Size(114, 40);
+            this.cancel_btn.TabIndex = 4;
+            this.cancel_btn.Text = "Cancel";
+            this.cancel_btn.UseVisualStyleBackColor = false;
             // 
             // groupBox4
             // 
@@ -466,11 +467,11 @@
         private System.Windows.Forms.Button select_btn;
         private System.Windows.Forms.TextBox dir_txtBox;
         private System.Windows.Forms.GroupBox groupBox3;
-        private System.Windows.Forms.TextBox textBox2;
+        private System.Windows.Forms.TextBox word_txtBox;
         private System.Windows.Forms.Button start_btn;
         private System.Windows.Forms.Button button2;
         private System.Windows.Forms.GroupBox groupBox2;
-        private System.Windows.Forms.CheckBox checkBox1;
+        private System.Windows.Forms.CheckBox agree_checkBox;
         private System.Windows.Forms.Panel Main_menu_panel;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Label Close_label;
@@ -480,7 +481,7 @@
         private System.Windows.Forms.Button button3;
         private System.Windows.Forms.GroupBox groupBox5;
         private System.Windows.Forms.Button button4;
-        private System.Windows.Forms.Button button5;
+        private System.Windows.Forms.Button cancel_btn;
         private System.Windows.Forms.GroupBox groupBox6;
         private System.Windows.Forms.RadioButton radioButton2;
         private System.Windows.Forms.RadioButton radioButton1;

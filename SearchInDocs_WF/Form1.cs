@@ -4,10 +4,13 @@ using System.ComponentModel;
 using System.Data;
 using System.Drawing;
 using System.Drawing.Imaging;
+using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using WordLibrary;
 
 namespace SearchInDocs_WF
 {
@@ -52,6 +55,29 @@ namespace SearchInDocs_WF
             }
             dir_txtBox.SelectAll();
             dir_txtBox.ScrollToCaret();
+        }
+
+        private void start_btn_Click(object sender, EventArgs e)
+        {
+            if (dir_txtBox.Text.Length > 0 && Directory.Exists(dir_txtBox.Text) 
+                && word_txtBox.Text.Length > 0 && agree_checkBox.Checked)
+            {
+                SearchOptions options = new SearchOptions(word_txtBox.Text, dir_txtBox.Text);
+
+                Thread thread = new Thread(new ParameterizedThreadStart(SearchInFilesAndConvertPagesToJpg));
+                
+                thread.IsBackground = true;
+                thread.Start(options);
+            }
+        }
+
+        private void SearchInFilesAndConvertPagesToJpg(object data)
+        {
+            if(data is SearchOptions)
+            {
+                SearchOptions options = (SearchOptions)data;
+                Search.SearchInFilesAndConvertPagesToJpg(options.StrToSearchFor, options.Path);
+            }
         }
     }
 }
