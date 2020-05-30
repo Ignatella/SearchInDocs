@@ -26,10 +26,9 @@ namespace WordLibrary
         private static List<FileInfo> Files { get; set; }
         private static string strToSearchFor { get; set; }
 
-        public static event EventHandler<ErrorOccuredEventArgs> ErrorOccured;
-        public static event EventHandler<FileIsProcessedEventArgs> FileIsProcessed;
+        public static event EventHandler<ErrorOccuredEventArgs> ErrorOccured; //need to be fixed (due to multithread)
 
-        public static void SearchInFilesAndConvertPagesToJpg(string strToSearchFor, string path)
+        public static void SearchInFilesAndConvertPagesToJpg(string strToSearchFor, string path, Action action)
         {
             dir = new DirectoryInfo(path);
             Search.strToSearchFor = strToSearchFor;
@@ -79,9 +78,8 @@ namespace WordLibrary
                         wordApps[q].Quit(false);
                         pagesNumbersLists[q].Clear();
 
-                        FileIsProcessed?.Invoke(null, new FileIsProcessedEventArgs(Files[q].Name));
+                        action.BeginInvoke(action.EndInvoke, null);
                     }
-
                 });
             }
             catch(OperationCanceledException) { }
