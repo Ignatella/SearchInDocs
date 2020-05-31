@@ -184,7 +184,7 @@ namespace WordLibrary
 
         private static void ConvertDocToJpeg(string searchWord, string fileName, int threadNum, params int[] pagesNumbersToBeConverted)
         {
-            DirectoryInfo wordDir = dir.Parent.CreateSubdirectory(searchWord);
+            DirectoryInfo wordDir = dir.CreateSubdirectory(searchWord);
 
             foreach (int pageNumber in pagesNumbersToBeConverted)
             {
