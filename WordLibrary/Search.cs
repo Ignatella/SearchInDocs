@@ -91,6 +91,10 @@ namespace WordLibrary
             KillAllRequiredWordProcesses();
         }
 
+        public static int GetFileCount(string path) =>
+             (new DirectoryInfo(path)).GetFiles().Where(fileInfo => !fileInfo.Name.Contains("~") &&
+                supportedFileExtensions.Contains(fileInfo.Extension)).Count();
+
         public static void Cancel()
         {
             cancellationToken.Cancel();
