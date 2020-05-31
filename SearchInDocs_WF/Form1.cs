@@ -6,6 +6,8 @@ using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
+using System.Runtime.Remoting.Contexts;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -16,15 +18,16 @@ namespace SearchInDocs_WF
 {
     public partial class Form1 : Form
     {
-
-        Point lastPoint;
-
+        private Point lastPoint;
+        private readonly SynchronizationContext syncContext;
         public Form1()
         {
             InitializeComponent();
             FormBorderStyle = FormBorderStyle.FixedDialog;
 
             this.FormBorderStyle = FormBorderStyle.None;
+
+            syncContext = SynchronizationContext.Current;
         }
 
         private void Form1_Load(object sender, EventArgs e)
@@ -62,6 +65,9 @@ namespace SearchInDocs_WF
             if (dir_txtBox.Text.Length > 0 && Directory.Exists(dir_txtBox.Text) 
                 && word_txtBox.Text.Length > 0 && agree_checkBox.Checked)
             {
+
+                progress_progressBar.Maximum = Search.GetFileCount(dir_txtBox.Text);
+
                 SearchOptions options = new SearchOptions(word_txtBox.Text, dir_txtBox.Text);
 
                 Thread thread = new Thread(new ParameterizedThreadStart(SearchInFilesAndConvertPagesToJpg));
@@ -76,8 +82,14 @@ namespace SearchInDocs_WF
             if(data is SearchOptions)
             {
                 SearchOptions options = (SearchOptions)data;
-                Search.SearchInFilesAndConvertPagesToJpg(options.StrToSearchFor, options.Path);
+                Search.SearchInFilesAndConvertPagesToJpg(options.StrToSearchFor, options.Path, (()=>
+                {
+                    syncContext.Post(UpdateUI, null);
+                }));
             }
         }
+
+        private void UpdateUI(object actionText) =>
+            progress_progressBar.Increment(1);
     }
 }

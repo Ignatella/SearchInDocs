@@ -53,8 +53,8 @@
             this.textBox3 = new System.Windows.Forms.TextBox();
             this.button3 = new System.Windows.Forms.Button();
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
-            this.toolStripStatusLabel2 = new System.Windows.Forms.ToolStripStatusLabel();
-            this.toolStripProgressBar1 = new System.Windows.Forms.ToolStripProgressBar();
+            this.progress_label = new System.Windows.Forms.ToolStripStatusLabel();
+            this.progress_progressBar = new System.Windows.Forms.ToolStripProgressBar();
             this.Main_menu_panel = new System.Windows.Forms.Panel();
             this.label3 = new System.Windows.Forms.Label();
             this.Close_label = new System.Windows.Forms.Label();
@@ -345,25 +345,25 @@
             // 
             this.statusStrip1.ImageScalingSize = new System.Drawing.Size(20, 20);
             this.statusStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.toolStripStatusLabel2,
-            this.toolStripProgressBar1});
+            this.progress_label,
+            this.progress_progressBar});
             this.statusStrip1.Location = new System.Drawing.Point(0, 384);
             this.statusStrip1.Name = "statusStrip1";
             this.statusStrip1.Size = new System.Drawing.Size(436, 26);
             this.statusStrip1.TabIndex = 3;
             this.statusStrip1.Text = "statusStrip1";
             // 
-            // toolStripStatusLabel2
+            // progress_label
             // 
-            this.toolStripStatusLabel2.ForeColor = System.Drawing.Color.Black;
-            this.toolStripStatusLabel2.Name = "toolStripStatusLabel2";
-            this.toolStripStatusLabel2.Size = new System.Drawing.Size(68, 20);
-            this.toolStripStatusLabel2.Text = "Progress:";
+            this.progress_label.ForeColor = System.Drawing.Color.Black;
+            this.progress_label.Name = "progress_label";
+            this.progress_label.Size = new System.Drawing.Size(68, 20);
+            this.progress_label.Text = "Progress:";
             // 
-            // toolStripProgressBar1
+            // progress_progressBar
             // 
-            this.toolStripProgressBar1.Name = "toolStripProgressBar1";
-            this.toolStripProgressBar1.Size = new System.Drawing.Size(100, 18);
+            this.progress_progressBar.Name = "progress_progressBar";
+            this.progress_progressBar.Size = new System.Drawing.Size(100, 18);
             // 
             // Main_menu_panel
             // 
@@ -459,8 +459,8 @@
 
         #endregion
         private System.Windows.Forms.StatusStrip statusStrip1;
-        private System.Windows.Forms.ToolStripStatusLabel toolStripStatusLabel2;
-        private System.Windows.Forms.ToolStripProgressBar toolStripProgressBar1;
+        private System.Windows.Forms.ToolStripStatusLabel progress_label;
+        private System.Windows.Forms.ToolStripProgressBar progress_progressBar;
         private System.Windows.Forms.TabPage tabPage2;
         private System.Windows.Forms.TabPage tabPage1;
         private System.Windows.Forms.GroupBox groupBox1;
