@@ -152,6 +152,7 @@
             this.cancelSearch_btn.TabIndex = 4;
             this.cancelSearch_btn.Text = "Cancel";
             this.cancelSearch_btn.UseVisualStyleBackColor = false;
+            this.cancelSearch_btn.Click += new System.EventHandler(this.cancelSearch_btn_Click);
             // 
             // groupBox3
             // 

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Diagnostics;
+using System.DirectoryServices.ActiveDirectory;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
@@ -85,8 +86,10 @@ namespace SearchInDocs_WF
             }
             else
             {
+                
                 progress_progressBar.Visible = false;
                 progress_label.Visible = false;
+                error_label.Text = "PROVIDE ALL REQUIRED DATA";
                 error_label.Visible = true;
             }
         }
@@ -123,6 +126,8 @@ namespace SearchInDocs_WF
                     return;
                 case "Progress:":
                     progress_progressBar.Visible = false;
+                    progress_label.Visible = true;
+                    error_label.Visible = false;
                     progress_label.Text = "Done.";
                     progress_progressBar.Value = 0;
                     return;
