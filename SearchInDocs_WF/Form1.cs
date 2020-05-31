@@ -104,7 +104,6 @@ namespace SearchInDocs_WF
                 }), (() =>
                 {
                     syncContext.Post((actionObject) => {
-                        progress_label.Text = "Done.";
                         StatusStripToggle();
                         ButtonsEnableToggle();
                     }, null);
@@ -114,21 +113,36 @@ namespace SearchInDocs_WF
 
         private void StatusStripToggle()
         {
-            if (!progress_progressBar.Visible)
+            switch (progress_label.Text)
             {
-                progress_progressBar.Visible = true;
-                progress_label.Visible = true;
-                progress_label.Text = "Progress:";
-                return;
+                case "Not started...":
+                case "Done.":
+                    progress_label.Visible = true;
+                    progress_progressBar.Visible = true;
+                    progress_label.Text = "Progress:";
+                    return;
+                case "Progress:":
+                    progress_progressBar.Visible = false;
+                    progress_label.Text = "Done.";
+                    progress_progressBar.Value = 0;
+                    return;
             }
-
-            progress_progressBar.Visible = false;
         }
 
         private void ButtonsEnableToggle()
         {
             start_btn.Enabled = !start_btn.Enabled;
             cancelSearch_btn.Enabled = !cancelSearch_btn.Enabled;
+        }
+
+        private void cancelSearch_btn_Click(object sender, EventArgs e)
+        {
+            Search.Cancel();
+
+            error_label.Text = "CANCELLING...";
+            error_label.Visible = true;
+            progress_label.Visible = false;
+            progress_progressBar.Visible = false;
         }
     }
 }
