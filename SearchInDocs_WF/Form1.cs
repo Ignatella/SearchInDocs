@@ -73,6 +73,7 @@ namespace SearchInDocs_WF
                 error_label.Visible = false;
                 StatusStripToggle();
                 progress_progressBar.Maximum = Search.GetFileCount(dir_txtBox.Text);
+                ButtonsEnableToggle();
                 #endregion
 
                 SearchOptions options = new SearchOptions(word_txtBox.Text.ToLower(), dir_txtBox.Text);
@@ -105,6 +106,7 @@ namespace SearchInDocs_WF
                     syncContext.Post((actionObject) => {
                         progress_label.Text = "Done.";
                         StatusStripToggle();
+                        ButtonsEnableToggle();
                     }, null);
                 }));
             }
@@ -121,6 +123,12 @@ namespace SearchInDocs_WF
             }
 
             progress_progressBar.Visible = false;
+        }
+
+        private void ButtonsEnableToggle()
+        {
+            start_btn.Enabled = !start_btn.Enabled;
+            cancelSearch_btn.Enabled = !cancelSearch_btn.Enabled;
         }
     }
 }

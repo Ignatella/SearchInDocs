@@ -34,7 +34,7 @@
             this.groupBox2 = new System.Windows.Forms.GroupBox();
             this.agree_checkBox = new System.Windows.Forms.CheckBox();
             this.start_btn = new System.Windows.Forms.Button();
-            this.button2 = new System.Windows.Forms.Button();
+            this.cancelSearch_btn = new System.Windows.Forms.Button();
             this.groupBox3 = new System.Windows.Forms.GroupBox();
             this.word_txtBox = new System.Windows.Forms.TextBox();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
@@ -102,7 +102,7 @@
             // 
             this.groupBox2.Controls.Add(this.agree_checkBox);
             this.groupBox2.Controls.Add(this.start_btn);
-            this.groupBox2.Controls.Add(this.button2);
+            this.groupBox2.Controls.Add(this.cancelSearch_btn);
             this.groupBox2.ForeColor = System.Drawing.Color.Black;
             this.groupBox2.Location = new System.Drawing.Point(3, 149);
             this.groupBox2.Name = "groupBox2";
@@ -137,21 +137,21 @@
             this.start_btn.UseVisualStyleBackColor = false;
             this.start_btn.Click += new System.EventHandler(this.start_btn_Click);
             // 
-            // button2
+            // cancelSearch_btn
             // 
-            this.button2.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(211)))), ((int)(((byte)(95)))), ((int)(((byte)(90)))));
-            this.button2.Cursor = System.Windows.Forms.Cursors.Default;
-            this.button2.Enabled = false;
-            this.button2.FlatAppearance.BorderColor = System.Drawing.Color.Black;
-            this.button2.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.button2.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.button2.ForeColor = System.Drawing.Color.Black;
-            this.button2.Location = new System.Drawing.Point(238, 75);
-            this.button2.Name = "button2";
-            this.button2.Size = new System.Drawing.Size(114, 40);
-            this.button2.TabIndex = 4;
-            this.button2.Text = "Cancel";
-            this.button2.UseVisualStyleBackColor = false;
+            this.cancelSearch_btn.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(211)))), ((int)(((byte)(95)))), ((int)(((byte)(90)))));
+            this.cancelSearch_btn.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.cancelSearch_btn.Enabled = false;
+            this.cancelSearch_btn.FlatAppearance.BorderColor = System.Drawing.Color.Black;
+            this.cancelSearch_btn.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.cancelSearch_btn.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.cancelSearch_btn.ForeColor = System.Drawing.Color.Black;
+            this.cancelSearch_btn.Location = new System.Drawing.Point(238, 75);
+            this.cancelSearch_btn.Name = "cancelSearch_btn";
+            this.cancelSearch_btn.Size = new System.Drawing.Size(114, 40);
+            this.cancelSearch_btn.TabIndex = 4;
+            this.cancelSearch_btn.Text = "Cancel";
+            this.cancelSearch_btn.UseVisualStyleBackColor = false;
             // 
             // groupBox3
             // 
@@ -478,7 +478,7 @@
         private System.Windows.Forms.GroupBox groupBox3;
         private System.Windows.Forms.TextBox word_txtBox;
         private System.Windows.Forms.Button start_btn;
-        private System.Windows.Forms.Button button2;
+        private System.Windows.Forms.Button cancelSearch_btn;
         private System.Windows.Forms.GroupBox groupBox2;
         private System.Windows.Forms.CheckBox agree_checkBox;
         private System.Windows.Forms.Panel Main_menu_panel;
