@@ -52,9 +52,10 @@
             this.groupBox4 = new System.Windows.Forms.GroupBox();
             this.textBox3 = new System.Windows.Forms.TextBox();
             this.button3 = new System.Windows.Forms.Button();
-            this.statusStrip1 = new System.Windows.Forms.StatusStrip();
+            this.main_StatusStrip = new System.Windows.Forms.StatusStrip();
             this.progress_label = new System.Windows.Forms.ToolStripStatusLabel();
             this.progress_progressBar = new System.Windows.Forms.ToolStripProgressBar();
+            this.error_label = new System.Windows.Forms.ToolStripStatusLabel();
             this.Main_menu_panel = new System.Windows.Forms.Panel();
             this.label3 = new System.Windows.Forms.Label();
             this.Close_label = new System.Windows.Forms.Label();
@@ -69,7 +70,7 @@
             this.groupBox6.SuspendLayout();
             this.groupBox5.SuspendLayout();
             this.groupBox4.SuspendLayout();
-            this.statusStrip1.SuspendLayout();
+            this.main_StatusStrip.SuspendLayout();
             this.Main_menu_panel.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -341,17 +342,18 @@
             this.button3.Text = "Select";
             this.button3.UseVisualStyleBackColor = true;
             // 
-            // statusStrip1
+            // main_StatusStrip
             // 
-            this.statusStrip1.ImageScalingSize = new System.Drawing.Size(20, 20);
-            this.statusStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.main_StatusStrip.ImageScalingSize = new System.Drawing.Size(20, 20);
+            this.main_StatusStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.progress_label,
-            this.progress_progressBar});
-            this.statusStrip1.Location = new System.Drawing.Point(0, 384);
-            this.statusStrip1.Name = "statusStrip1";
-            this.statusStrip1.Size = new System.Drawing.Size(436, 26);
-            this.statusStrip1.TabIndex = 3;
-            this.statusStrip1.Text = "statusStrip1";
+            this.progress_progressBar,
+            this.error_label});
+            this.main_StatusStrip.Location = new System.Drawing.Point(0, 384);
+            this.main_StatusStrip.Name = "main_StatusStrip";
+            this.main_StatusStrip.Size = new System.Drawing.Size(436, 26);
+            this.main_StatusStrip.TabIndex = 3;
+            this.main_StatusStrip.Text = "statusStrip1";
             // 
             // progress_label
             // 
@@ -364,6 +366,13 @@
             // 
             this.progress_progressBar.Name = "progress_progressBar";
             this.progress_progressBar.Size = new System.Drawing.Size(100, 18);
+            // 
+            // error_label
+            // 
+            this.error_label.ForeColor = System.Drawing.Color.Red;
+            this.error_label.Name = "error_label";
+            this.error_label.Size = new System.Drawing.Size(212, 20);
+            this.error_label.Text = "PROVIDE ALL REQUIRED DATA";
             // 
             // Main_menu_panel
             // 
@@ -427,7 +436,7 @@
             this.ClientSize = new System.Drawing.Size(436, 410);
             this.Controls.Add(this.Main_menu_panel);
             this.Controls.Add(tabControl1);
-            this.Controls.Add(this.statusStrip1);
+            this.Controls.Add(this.main_StatusStrip);
             this.ForeColor = System.Drawing.Color.Black;
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.Fixed3D;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
@@ -448,8 +457,8 @@
             this.groupBox5.ResumeLayout(false);
             this.groupBox4.ResumeLayout(false);
             this.groupBox4.PerformLayout();
-            this.statusStrip1.ResumeLayout(false);
-            this.statusStrip1.PerformLayout();
+            this.main_StatusStrip.ResumeLayout(false);
+            this.main_StatusStrip.PerformLayout();
             this.Main_menu_panel.ResumeLayout(false);
             this.Main_menu_panel.PerformLayout();
             this.ResumeLayout(false);
@@ -458,7 +467,7 @@
         }
 
         #endregion
-        private System.Windows.Forms.StatusStrip statusStrip1;
+        private System.Windows.Forms.StatusStrip main_StatusStrip;
         private System.Windows.Forms.ToolStripStatusLabel progress_label;
         private System.Windows.Forms.ToolStripProgressBar progress_progressBar;
         private System.Windows.Forms.TabPage tabPage2;
@@ -487,6 +496,7 @@
         private System.Windows.Forms.RadioButton radioButton1;
         private System.Windows.Forms.TextBox textBox4;
         private System.Windows.Forms.Label label4;
+        private System.Windows.Forms.ToolStripStatusLabel error_label;
     }
 }
 

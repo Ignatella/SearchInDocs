@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
@@ -28,6 +29,9 @@ namespace SearchInDocs_WF
             this.FormBorderStyle = FormBorderStyle.None;
 
             syncContext = SynchronizationContext.Current;
+
+            progress_progressBar.Visible = false;
+            error_label.Visible = false;
         }
 
         private void Form1_Load(object sender, EventArgs e)
@@ -62,18 +66,27 @@ namespace SearchInDocs_WF
 
         private void start_btn_Click(object sender, EventArgs e)
         {
-            if (dir_txtBox.Text.Length > 0 && Directory.Exists(dir_txtBox.Text) 
+            if (dir_txtBox.Text.Length > 0 && Directory.Exists(dir_txtBox.Text)
                 && word_txtBox.Text.Length > 0 && agree_checkBox.Checked)
             {
-
+                #region setUpUI
+                error_label.Visible = false;
+                StatusStripToggle();
                 progress_progressBar.Maximum = Search.GetFileCount(dir_txtBox.Text);
+                #endregion
 
-                SearchOptions options = new SearchOptions(word_txtBox.Text, dir_txtBox.Text);
+                SearchOptions options = new SearchOptions(word_txtBox.Text.ToLower(), dir_txtBox.Text);
 
                 Thread thread = new Thread(new ParameterizedThreadStart(SearchInFilesAndConvertPagesToJpg));
-                
+
                 thread.IsBackground = true;
                 thread.Start(options);
+            }
+            else
+            {
+                progress_progressBar.Visible = false;
+                progress_label.Visible = false;
+                error_label.Visible = true;
             }
         }
 
@@ -84,17 +97,30 @@ namespace SearchInDocs_WF
                 SearchOptions options = (SearchOptions)data;
                 Search.SearchInFilesAndConvertPagesToJpg(options.StrToSearchFor, options.Path, (() =>
                 {
-                    syncContext.Post(UpdateProgressBar, null);
+                    syncContext.Post((actionObject) => {
+                        progress_progressBar.Increment(1);
+                    }, null);
                 }), (() =>
                 {
                     syncContext.Post((actionObject) => {
                         progress_label.Text = "Done.";
+                        StatusStripToggle();
                     }, null);
                 }));
             }
         }
 
-        private void UpdateProgressBar(object actionText) =>
-            progress_progressBar.Increment(1);
+        private void StatusStripToggle()
+        {
+            if (!progress_progressBar.Visible)
+            {
+                progress_progressBar.Visible = true;
+                progress_label.Visible = true;
+                progress_label.Text = "Progress:";
+                return;
+            }
+
+            progress_progressBar.Visible = false;
+        }
     }
 }
