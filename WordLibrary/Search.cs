@@ -31,7 +31,7 @@ namespace WordLibrary
         public static void SearchInFilesAndConvertPagesToJpg(string strToSearchFor, string path, Action action)
         {
             dir = new DirectoryInfo(path);
-            Search.strToSearchFor = strToSearchFor;
+            Search.strToSearchFor = strToSearchFor.ToLower();
 
 
             Files = new List<FileInfo>();
