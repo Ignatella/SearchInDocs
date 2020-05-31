@@ -357,8 +357,8 @@
             // 
             this.progress_label.ForeColor = System.Drawing.Color.Black;
             this.progress_label.Name = "progress_label";
-            this.progress_label.Size = new System.Drawing.Size(68, 20);
-            this.progress_label.Text = "Progress:";
+            this.progress_label.Size = new System.Drawing.Size(93, 20);
+            this.progress_label.Text = "Not started...";
             // 
             // progress_progressBar
             // 

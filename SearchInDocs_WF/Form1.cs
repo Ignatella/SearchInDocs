@@ -82,14 +82,19 @@ namespace SearchInDocs_WF
             if(data is SearchOptions)
             {
                 SearchOptions options = (SearchOptions)data;
-                Search.SearchInFilesAndConvertPagesToJpg(options.StrToSearchFor, options.Path, (()=>
+                Search.SearchInFilesAndConvertPagesToJpg(options.StrToSearchFor, options.Path, (() =>
                 {
-                    syncContext.Post(UpdateUI, null);
+                    syncContext.Post(UpdateProgressBar, null);
+                }), (() =>
+                {
+                    syncContext.Post((actionObject) => {
+                        progress_label.Text = "Done.";
+                    }, null);
                 }));
             }
         }
 
-        private void UpdateUI(object actionText) =>
+        private void UpdateProgressBar(object actionText) =>
             progress_progressBar.Increment(1);
     }
 }
