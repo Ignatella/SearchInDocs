@@ -18,7 +18,7 @@ namespace WordLibrary
         private static readonly string[] supportedFileExtensions = { ".doc", ".docx" };
 
         private static object syncObject = new object();
-        private static CancellationTokenSource cancellationToken = new CancellationTokenSource();
+        private static CancellationTokenSource CancellationToken { get; set; }
         private static Word.Application[] wordApps { get; set; }
         private static Document[] wordDocs { get; set; }
         private static List<int>[] pagesNumbersLists { get; set; }
@@ -47,12 +47,12 @@ namespace WordLibrary
             KillAllRequiredWordProcesses();
 
             try 
-            { 
-
+            {
+                CancellationToken = new CancellationTokenSource();
                 Parallel.For(0, Files.Count, new ParallelOptions()
                 {
                     MaxDegreeOfParallelism = 3,
-                    CancellationToken = cancellationToken.Token
+                    CancellationToken = CancellationToken.Token
                 }, (int q) =>
                 {
                     try
@@ -85,7 +85,6 @@ namespace WordLibrary
             catch(OperationCanceledException) { }
             finally
             {
-                cancellationToken.Dispose();
                 workIsDoneAction.BeginInvoke(workIsDoneAction.EndInvoke, null);
             }
 
@@ -98,7 +97,7 @@ namespace WordLibrary
 
         public static void Cancel()
         {
-            cancellationToken.Cancel();
+            CancellationToken.Cancel();
         }
 
         private static void SearchInTextBox(string wordToSearchFor, int threadNum)
