@@ -109,6 +109,7 @@ namespace SearchInDocs_WF
                     syncContext.Post((actionObject) => {
                         StatusStripToggle();
                         ButtonsEnableToggle();
+                        Process.Start(Path.Combine(options.Path + @"/" + options.StrToSearchFor));
                     }, null);
                 }));
             }
