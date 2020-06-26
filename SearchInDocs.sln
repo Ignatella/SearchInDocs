@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WordLibrary", "WordLibrary\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SearchInDocs_WF", "SearchInDocs_WF\SearchInDocs_WF.csproj", "{FC504D9A-7276-4FC0-BE27-C207ADCA1885}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SearchInDocs_WPF", "SearchInDocs_WPF\SearchInDocs_WPF.csproj", "{0FB41432-B952-4702-90FE-A7587890F724}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{FC504D9A-7276-4FC0-BE27-C207ADCA1885}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FC504D9A-7276-4FC0-BE27-C207ADCA1885}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FC504D9A-7276-4FC0-BE27-C207ADCA1885}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0FB41432-B952-4702-90FE-A7587890F724}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0FB41432-B952-4702-90FE-A7587890F724}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0FB41432-B952-4702-90FE-A7587890F724}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0FB41432-B952-4702-90FE-A7587890F724}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

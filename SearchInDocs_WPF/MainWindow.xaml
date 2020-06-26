@@ -5,7 +5,9 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:SearchInDocs_WPF"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
+        AllowsTransparency="true" WindowStyle="None" Background="Transparent"
+        Title="FindIT" x:Name="Window" Height="400" Width="300" ResizeMode="NoResize"
+        Style="{StaticResource RoundCornerWindow}">
     <Grid>
         
     </Grid>
